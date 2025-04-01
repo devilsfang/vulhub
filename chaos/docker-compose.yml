@@ -1,0 +1,20 @@
+version: '3'
+services:
+  chaos:
+    image: tiagorlampert/chaos:v5.0.8  # ✅ 已使用固定版本
+    container_name: chaos
+    ports:
+      - "8015:8080"
+    environment:
+      - PORT=8080
+      - SQLITE_DATABASE=chaos
+      - TMPDIR=/temp  # 显式指定临时目录路径
+    volumes:
+      - ~/chaos-data/database:/database  # 数据库独立存储
+      - ~/chaos-data/temp:/temp          # 临时文件专用目录
+    restart: unless-stopped  # 新增自动重启策略
+    healthcheck:    # 新增健康检查
+      test: ["CMD-SHELL", "curl -f http://localhost:8080 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
